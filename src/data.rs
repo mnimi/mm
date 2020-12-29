@@ -24,17 +24,20 @@ impl App
   /// and close it.
   pub fn init() -> Result<Self>
   {
+    use anyhow::Error;
+    use crate::LogLevel;
+
     let data = Mutex::new(if std::fs::metadata("app_data.yml").is_ok() {
       AppData::new()
           .load()
           .unwrap()
     } else {
-      AppData::new()
-          .save()
-          .unwrap();
+      log!(LogLevel::Error, "File does not exist. Creating...");
+      let dat = AppData::new();
+      dat.save().unwrap();
 
 
-      Err("file does not exist!")
+      dat
     });
 
 
@@ -82,7 +85,7 @@ impl AppData
 
     let content = serde_yaml::to_string(self).unwrap();
 
-    fi.write_all(content.as_bytes());
+    fi.write_all(content.as_bytes()).unwrap();
 
 
     Ok(())
@@ -91,17 +94,23 @@ impl AppData
   pub fn load(mut self) -> Result<Self>
   {
     use std::io::Read;
+    use crate::LogLevel;
 
     let mut fi = if std::fs::metadata("app_data.yml").is_ok() {
       File::open("app_data.yml")
     } else {
-      Err("file does not exist!")
+      log!(LogLevel::Error, "Configuration file does not exist!");
+      log!(LogLevel::Info, "Creating config...");
+      &self.save().unwrap();
+
+
+      Err(std::io::Error::from_raw_os_error(1))
     }.unwrap();
 
     let mut content = String::new();
-    fi.read_to_string(&mut content);
+    fi.read_to_string(&mut content).unwrap();
 
-    &mut self = serde_yaml::from_str(content.as_str()).unwrap();
+    self = serde_yaml::from_str(content.as_str()).unwrap();
 
 
     Ok(self)

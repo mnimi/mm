@@ -24,7 +24,7 @@ pub mod world;
 async fn main() -> Result<(), anyhow::Error>
 {
   use self::data::App;
-  let mut app = App::init().await?;
+  let mut app = App::init()?;
 
   log!(LogLevel::Info, "Starting...");
 
