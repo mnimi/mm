@@ -1,9 +1,5 @@
 // Better error handling.
 extern crate anyhow;
-
-// Amethyst Game Engine.
-extern crate amethyst;
-
 // Logging.
 #[macro_use] extern crate log;
 
