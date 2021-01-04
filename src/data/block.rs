@@ -1,13 +1,14 @@
+#[derive(Deserialize, Serialize)]
 pub struct Block
 {
   id: u32,
   tags: Vec<u32>,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Chunk
 {
-  block: [u32; 4096]
+  block: Vec<Block>
 }
 
 impl Chunk
@@ -18,7 +19,7 @@ impl Chunk
   }
 }
 
-
+#[derive(Deserialize, Serialize)]
 pub struct Map
 {
   chunk: Vec<Chunk>,
@@ -44,7 +45,6 @@ impl Map
         break Some(self.chunk[i].clone());
       }
     };
-
 
 
     match value {

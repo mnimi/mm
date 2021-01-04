@@ -10,6 +10,8 @@ use anyhow::Result;
 pub mod block;
 pub mod world;
 
+pub const APP_DATA_CONFIG: String = String::from("app_data.toml");
+
 /// Globally accessible, shared application data.
 pub struct App
 {
@@ -32,7 +34,7 @@ impl App
     use anyhow::Error;
     use crate::LogLevel;
 
-    let data = Mutex::new(if std::fs::metadata("app_data.yml").is_ok() {
+    let data = Mutex::new(if std::fs::metadata("app_data.toml").is_ok() {
       AppData::new()
           .load()
           .unwrap()
@@ -82,10 +84,10 @@ impl AppData
   {
     use std::io::Write;
 
-    let mut fi = if std::fs::metadata("app_data.yml").is_ok() {
-      File::open("app_data.yml")
+    let mut fi = if std::fs::metadata("app_data.toml").is_ok() {
+      File::open("app_data.toml")
     } else {
-      File::create("app_data.yml")
+      File::create("app_data.toml")
     }.unwrap();
 
     let content = toml::to_string(self).unwrap();
@@ -101,8 +103,8 @@ impl AppData
     use std::io::Read;
     use crate::LogLevel;
 
-    let mut fi = if std::fs::metadata("app_data.yml").is_ok() {
-      File::open("app_data.yml")
+    let mut fi = if std::fs::metadata("app_data.toml").is_ok() {
+      File::open("app_data.toml")
     } else {
       log!(LogLevel::Error, "Configuration file does not exist!");
       log!(LogLevel::Info, "Creating config...");
@@ -120,3 +122,5 @@ impl AppData
     Ok(self)
   }
 }
+
+
