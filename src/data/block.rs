@@ -1,11 +1,11 @@
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Block
 {
   id: u32,
   tags: Vec<u32>,
 }
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Chunk
 {
   block: Vec<Block>
@@ -32,24 +32,31 @@ impl Map
 {
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> Chunk
   {
-    const X: i32 = (x - (x % 16)) / 16;
-    const Y: i32 = (x - (x % 16)) / 16;
-    const Z: i32 = (x - (x % 16)) / 16;
+    let x: i32 = (x - (x % 16)) / 16;
+    let y: i32 = (x - (x % 16)) / 16;
+    let z: i32 = (x - (x % 16)) / 16;
 
-    let value = for i in 0..self.x.len()
+    static mut VALUE: Option<Chunk> = None;
+
+    for i in 0..self.x.len()
     {
-      if self.x[i] == X
-          && self.y[i] == Y
-          && self.z[i] == Z
+      if     self.x[i] == x
+          && self.y[i] == y
+          && self.z[i] == z
       {
-        break Some(self.chunk[i].clone());
+        break;
       }
-    };
 
+      unsafe {
+        VALUE = Some(self.chunk[i].clone());
+      }
+    }
 
-    match value {
-      Some(v) => v,
-      () => load_chunk(x, y, z)
+    unsafe {
+      match VALUE.clone() {
+        Some(v) => v,
+        None => Self::load_chunk(x, y, z)
+      }
     }
   }
 

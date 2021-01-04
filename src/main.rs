@@ -8,7 +8,7 @@ extern crate anyhow;
 
 // Data de/serialization.
 #[macro_use] extern crate serde;
-extern crate serde_derive;
+#[macro_use] extern crate serde_derive;
 extern crate toml;
 
 // Asynchronous input/output.

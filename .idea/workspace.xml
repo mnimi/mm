@@ -11,10 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="89f2db27-8f9c-49cd-b9d4-7facdd03bbb5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/data.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/data.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/data/block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/block.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <list id="78bb7b40-3585-4e5c-92f1-af3804c66042" name="Changes by canad" comment="" />
     <list id="4214197d-72d1-4bc2-a3bf-e44687a76857" name="Changes by shala" comment="" />
