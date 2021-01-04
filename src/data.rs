@@ -1,13 +1,16 @@
 use std::fs::File;
+use std::io::Error;
 use std::io::Read;
 use std::io::Write;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime};
 
-use anyhow::{Error, Result};
+use anyhow::Result;
 
 pub mod block;
 pub mod world;
+
+pub const APP_DATA_FILE: &'static str = "app_data.toml";
 
 /// Globally accessible, shared application data.
 pub struct App
@@ -31,7 +34,7 @@ impl App
     use anyhow::Error;
     use crate::LogLevel;
 
-    let data = Mutex::new(if std::fs::metadata("app_data.yml").is_ok() {
+    let data = Mutex::new(if std::fs::metadata(&APP_DATA_FILE).is_ok() {
       AppData::new()
           .load()
           .unwrap()
@@ -55,7 +58,7 @@ impl App
 }
 
 /// Globally accessible application data.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AppData
 {
   /// The reported time from the host machine.
@@ -81,10 +84,10 @@ impl AppData
   {
     use std::io::Write;
 
-    let mut fi = if std::fs::metadata("app_data.yml").is_ok() {
-      File::open("app_data.yml")
+    let mut fi = if std::fs::metadata(&APP_DATA_FILE).is_ok() {
+      File::open(&APP_DATA_FILE)
     } else {
-      File::create("app_data.yml")
+      File::create(&APP_DATA_FILE)
     }.unwrap();
 
     let content = toml::to_string(self).unwrap();
@@ -100,15 +103,15 @@ impl AppData
     use std::io::Read;
     use crate::LogLevel;
 
-    let mut fi = if std::fs::metadata("app_data.yml").is_ok() {
-      File::open("app_data.yml")
+    let mut fi = if std::fs::metadata(&APP_DATA_FILE).is_ok() {
+      File::open(&APP_DATA_FILE)
     } else {
       log!(LogLevel::Error, "Configuration file does not exist!");
       log!(LogLevel::Info, "Creating config...");
       &self.save().unwrap();
 
 
-      Err(std::io::Error::from_raw_os_error(1))
+      Err(Error::from_raw_os_error(1))
     }.unwrap();
 
     let mut content = String::new();
@@ -119,3 +122,5 @@ impl AppData
     Ok(self)
   }
 }
+
+
