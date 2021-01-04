@@ -11,9 +11,5 @@ anyhow = "1.0.37"
 log = "0.4.11"
 serde = "1.0.118"
 serde_derive = "1.0.118"
-serde_yaml = "0.8.14"
 tokio = { version = "1.0.1", features = ["full"] }
-
-[dependencies.amethyst]
-version = "*"
-features = ["vulkan"]
+toml = "0.5.8"
