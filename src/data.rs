@@ -1,9 +1,13 @@
-use anyhow::{Result, Error};
-//mutex is sync thing so we can play around with it but nothing else
-use std::sync::Mutex;
-use std::time::{Duration, SystemTime};
 use std::fs::File;
 use std::io::Read;
+use std::io::Write;
+use std::sync::Mutex;
+use std::time::{Duration, SystemTime};
+
+use anyhow::{Error, Result};
+
+pub mod block;
+pub mod world;
 
 /// Globally accessible, shared application data.
 pub struct App
@@ -83,7 +87,7 @@ impl AppData
       File::create("app_data.yml")
     }.unwrap();
 
-    let content = serde_yaml::to_string(self).unwrap();
+    let content = toml::to_string(self).unwrap();
 
     fi.write_all(content.as_bytes()).unwrap();
 
@@ -109,8 +113,7 @@ impl AppData
 
     let mut content = String::new();
     fi.read_to_string(&mut content).unwrap();
-
-    self = serde_yaml::from_str(content.as_str()).unwrap();
+    self = toml::from_str(content.as_str()).unwrap();
 
 
     Ok(self)
