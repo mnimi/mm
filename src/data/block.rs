@@ -1,8 +1,15 @@
 #[derive(Clone, Deserialize, Serialize)]
-pub struct Block
+pub struct Block<'a>
 {
   id: u32,
-  tags: Vec<u32>,
+  tag: Vec<u32>,
+  block_type: Vec<&'a dyn BlockType>,
+}
+
+pub trait BlockType{
+
+  fn update();
+
 }
 
 #[derive(Clone, Deserialize, Serialize)]
