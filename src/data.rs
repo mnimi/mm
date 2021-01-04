@@ -1,10 +1,11 @@
 use std::fs::File;
+use std::io::Error;
 use std::io::Read;
 use std::io::Write;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime};
 
-use anyhow::{Error, Result};
+use anyhow::Result;
 
 pub mod block;
 pub mod world;
@@ -108,7 +109,7 @@ impl AppData
       &self.save().unwrap();
 
 
-      Err(std::io::Error::from_raw_os_error(1))
+      Err(Error::from_raw_os_error(1))
     }.unwrap();
 
     let mut content = String::new();
