@@ -36,27 +36,24 @@ impl Map
     let y: i32 = (x - (x % 16)) / 16;
     let z: i32 = (x - (x % 16)) / 16;
 
-    static mut VALUE: Option<Chunk> = None;
+    let mut value: Option<Chunk> = None;
 
     for i in 0..self.x.len()
     {
-      if     self.x[i] == x
+      if self.x[i] == x
           && self.y[i] == y
           && self.z[i] == z
       {
         break;
       }
 
-      unsafe {
-        VALUE = Some(self.chunk[i].clone());
-      }
+      value = Some(self.chunk[i].clone());
     }
 
-    unsafe {
-      match VALUE.clone() {
-        Some(v) => v,
-        None => Self::load_chunk(x, y, z)
-      }
+    match value
+    {
+      Some(v) => v,
+      None => Self::load_chunk(x, y, z)
     }
   }
 

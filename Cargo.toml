@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.37"
 ash = "0.31.0"
+lazy_static = "1.4.0"
 log = "0.4.11"
 serde = "1.0.118"
 serde_derive = "1.0.118"

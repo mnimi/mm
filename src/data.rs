@@ -51,6 +51,11 @@ impl App
     Ok(App { data })
   }
 
+  pub async fn execute(&self) -> Result<()>
+  {
+    Ok(())
+  }
+
   pub fn run_time(&self)
   {
     todo!()
