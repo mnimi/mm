@@ -1,21 +1,25 @@
 //! A Minecraft clone written in Rust.
 #![allow(overflowing_literals)]
 
-// Vulkan API wrapper for the Rust programming language
-extern crate ash;
-
 // Better error handling.
 extern crate anyhow;
 
+// Vulkan API wrapper for the Rust programming language
+extern crate erupt;
+
 // Lazily initialised statics.
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 
 // Logging.
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 // Data de/serialization.
-#[macro_use] extern crate serde;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate toml;
 
 // Asynchronous input/output.
@@ -27,24 +31,20 @@ pub use log::Level as LogLevel;
 pub mod data;
 pub mod gfx;
 
-lazy_static!
-{
+lazy_static! {
   pub static ref ASYNC: tokio::runtime::Runtime = Runtime::new().unwrap();
 }
 
 fn main() -> Result<(), anyhow::Error>
 {
-  use self::data::App;
-  let mut app = App::init()?;
+  use self::data::APPLICATION;
 
   log!(LogLevel::Info, "Starting...");
 
-  // Call async functions inside of the async runtime.
+  // Call async functions inside of the async runtime block.
   ASYNC.block_on(async {
-    app.execute().await;
+    &APPLICATION.exec_setup().await.unwrap();
   });
-
-
 
   Ok(())
 }

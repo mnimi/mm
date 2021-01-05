@@ -8,10 +8,18 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.37"
-ash = "0.31.0"
+erupt = "0.16.0+162"
 lazy_static = "1.4.0"
 log = "0.4.11"
 serde = "1.0.118"
 serde_derive = "1.0.118"
 tokio = { version = "1.0.1", features = ["full"] }
 toml = "0.5.8"
+
+[target.'cfg(target_os="macos")'.dependencies]
+metal = "0.17"
+cocoa = "0.24"
+objc  = "0.2"
+
+[target.'cfg(target_os="windows")'.dependencies]
+winapi = { version = "0.3", features = ["windef", "libloaderapi"] }

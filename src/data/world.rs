@@ -5,6 +5,5 @@ pub struct World
   length: u128,
   height: u128,
   name: String,
-  seed: u64,
+  seed: String,
 }
-

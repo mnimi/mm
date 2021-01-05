@@ -1,16 +1,18 @@
+use anyhow::Result;
 use std::fs::File;
 use std::io::Error;
-use std::io::Read;
-use std::io::Write;
 use std::sync::Mutex;
-use std::time::{Duration, SystemTime};
-
-use anyhow::Result;
+use std::time::SystemTime;
 
 pub mod block;
 pub mod world;
 
 pub const APP_DATA_FILE: &'static str = "app_data.toml";
+pub const CHUNK_DATA_GENESIS: &'static str = "chunk_genesis.toml";
+
+lazy_static! {
+  pub static ref APPLICATION: App = App::init().unwrap();
+}
 
 /// Globally accessible, shared application data.
 pub struct App
@@ -31,27 +33,22 @@ impl App
   /// and close it.
   pub fn init() -> Result<Self>
   {
-    use anyhow::Error;
     use crate::LogLevel;
 
     let data = Mutex::new(if std::fs::metadata(&APP_DATA_FILE).is_ok() {
-      AppData::new()
-          .load()
-          .unwrap()
+      AppData::new().load().unwrap()
     } else {
       log!(LogLevel::Error, "File does not exist. Creating...");
       let dat = AppData::new();
       dat.save().unwrap();
 
-
       dat
     });
-
 
     Ok(App { data })
   }
 
-  pub async fn execute(&self) -> Result<()>
+  pub async fn exec_setup(&self) -> Result<()>
   {
     Ok(())
   }
@@ -81,7 +78,7 @@ impl AppData
     AppData {
       time: SystemTime::now(),
       username: "USERNAME".to_string(),
-      worlds: vec![]
+      worlds: vec![],
     }
   }
 
@@ -93,20 +90,20 @@ impl AppData
       File::open(&APP_DATA_FILE)
     } else {
       File::create(&APP_DATA_FILE)
-    }.unwrap();
+    }
+    .unwrap();
 
     let content = toml::to_string(self).unwrap();
 
     fi.write_all(content.as_bytes()).unwrap();
-
 
     Ok(())
   }
 
   pub fn load(mut self) -> Result<Self>
   {
-    use std::io::Read;
     use crate::LogLevel;
+    use std::io::Read;
 
     let mut fi = if std::fs::metadata(&APP_DATA_FILE).is_ok() {
       File::open(&APP_DATA_FILE)
@@ -115,17 +112,14 @@ impl AppData
       log!(LogLevel::Info, "Creating config...");
       &self.save().unwrap();
 
-
       Err(Error::from_raw_os_error(1))
-    }.unwrap();
+    }
+    .unwrap();
 
     let mut content = String::new();
     fi.read_to_string(&mut content).unwrap();
     self = toml::from_str(content.as_str()).unwrap();
 
-
     Ok(self)
   }
 }
-
-
