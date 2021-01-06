@@ -92,17 +92,17 @@ pub struct Map
 {
   /// Chunks displayed on the map.
   chunk: Vec<Chunk>,
-  /// The x coordinate of each block.
+  /// The x coordinate of each chunk.
   x: Vec<i32>,
-  /// The y coordinate of each block.
+  /// The y coordinate of each chunk.
   y: Vec<i32>,
-  /// The z coordinate of each block.
+  /// The z coordinate of each chunk.
   z: Vec<i32>,
 }
 
 impl Map
 {
-  /// Get the chunk at the specified coordinates.
+  /// Get the index of the chunk at the specified coordinates.
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> usize
   {
     let mut value: Option<usize> = None;
