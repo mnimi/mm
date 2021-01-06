@@ -32,6 +32,7 @@ impl App
 {
   /// Initialise the application.
   ///
+  ///
   /// Returns a result containing one of two possible outcomes of the initialisation:
   /// Success, in which case we continue into the main application loop
   ///
