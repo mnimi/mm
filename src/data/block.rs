@@ -74,15 +74,62 @@ pub struct Chunk
 
 impl Chunk
 {
-  pub fn index(x: u32, y: u32, z: u32) -> u32
+  pub fn index(x: u32, y: u32, z: u32) -> usize
   {
-    (x + (y * 16) + (z * 256))
+    (x + (y * 16) + (z * 256)) as usize
   }
   
-  pub fn adj(&self, index: u32) 
+  pub fn adj(&self, index: u32) -> Vec<Block>
   {
+    let index = index as f32;
     let mut val: Vec<Block> = vec![];
-    let mut remainder = index;
+    if (index % 16) + 1 > 15
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index - 15));
+    } else
+    {
+      val.push(self.block[index + 1]);
+    }
+    if (index % 16) - 1 < 0
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index + 15));
+    } else
+    {
+      val.push(self.block[index - 1]);
+    }
+
+    if ((index % 256) / 16) as f32.floor() + 1 > 15
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
+    } else
+    {
+      val.push(self.block[index + 16]);
+    }
+    if ((index % 256) / 16) as f32.floor() - 1 < 0
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
+    } else
+    {
+      val.push(self.block[index - 16]);
+    }
+
+    if (index / 256) as f32.floor() + 1 > 15
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
+    } else
+    {
+      val.push(self.block[index + 16]);
+    }
+    if (index / 256) as f32.floor() - 1 < 0
+    {
+      val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
+    } else
+    {
+      val.push(self.block[index - 16]);
+    }
+
+    val
+
   }
 }
 
@@ -92,12 +139,6 @@ pub struct World
 {
   /// Chunks displayed in the world.
   chunk: Vec<Chunk>,
-  /// The x coordinate of each chunk.
-  x: Vec<i32>,
-  /// The y coordinate of each chunk.
-  y: Vec<i32>,
-  /// The z coordinate of each chunk.
-  z: Vec<i32>,
 }
 
 impl World
@@ -166,8 +207,12 @@ impl World
     self.chunk.len() - 1
   }
 
-  fn unload_chunk(x: i32, y: i32, z: i32)
+  pub fn unload_chunk(x: i32, y: i32, z: i32)
   {
+    todo!()
+  }
+
+  pub fn chunk_overflow(chunk : &Chunk, block : usize){
     todo!()
   }
 }
