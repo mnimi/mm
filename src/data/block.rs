@@ -12,25 +12,25 @@ lazy_static! {
 }
 
 #[repr(u32)]
-pub enum Id
+pub enum BlockId
 {
-  Air,
-  Stone,
-  Grass,
-  Dirt,
-  Cobble,
-  WoodPlank,
-  Sapling,
-  Bedrock,
-  Water,
-  Lava,
+  Air = 0,
+  Stone = 1,
+  Grass = 2,
+  Dirt = 3,
+  Cobblestone = 4,
+  WoodPlank = 5,
+  Sapling = 6,
+  Bedrock = 7,
+  Water = 8,
+  Lava = 9,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
 /// Represents a block in the world.
 pub struct Block
 {
-  id: block_id,
+  id: BlockId,
   variant: u32,
   tag: Vec<u32>,
 }

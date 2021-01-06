@@ -31,6 +31,7 @@ use tokio::runtime::Runtime;
 pub use log::Level as LogLevel;
 
 pub mod data;
+pub mod ecs;
 pub mod gfx;
 
 lazy_static! {
