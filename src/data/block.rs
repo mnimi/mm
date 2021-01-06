@@ -1,3 +1,8 @@
+/*!
+Block-related data structures.
+*/
+
+
 use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
 
@@ -22,6 +27,7 @@ pub enum Id
 }
 
 #[derive(Clone, Deserialize, Serialize)]
+/// Represents a block in the world.
 pub struct Block
 {
   id: block_id,
@@ -53,6 +59,10 @@ impl SmartBlock for Liquid
 }
 
 #[derive(Clone, Deserialize, Serialize)]
+/// Represents a chunk in the world.
+///
+///
+/// Filled with blocks.
 pub struct Chunk
 {
   x: i32,
@@ -68,23 +78,31 @@ impl Chunk
   {
     (x + (y * 16) + (z * 256))
   }
-  pub fn adj(&self, index: u32) {
+  
+  pub fn adj(&self, index: u32) 
+  {
     let mut val: Vec<Block> = vec![];
     let mut remainder = index;
   }
 }
 
 #[derive(Deserialize, Serialize)]
+/// A vectorized map of the world.
 pub struct Map
 {
+  /// Chunks displayed on the map.
   chunk: Vec<Chunk>,
+  /// The x coordinate of each block.
   x: Vec<i32>,
+  /// The y coordinate of each block.
   y: Vec<i32>,
+  /// The z coordinate of each block.
   z: Vec<i32>,
 }
 
 impl Map
 {
+  /// Get the chunk at the specified coordinates.
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> usize
   {
     let mut value: Option<usize> = None;
