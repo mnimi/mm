@@ -54,7 +54,6 @@ impl App
     Ok(App { data })
   }
 
-
   pub fn run_time(&self)
   {
     todo!()

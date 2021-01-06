@@ -88,7 +88,7 @@ impl Map
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> usize
   {
     let mut value: Option<usize> = None;
-
+    
     for i in 0..self.x.len()
     {
       if self.x[i] == x
@@ -99,7 +99,7 @@ impl Map
         break;
       }
     }
-
+    
     match value {
       Some(v) => v,
       None => Self::load_chunk(&mut MAP.unwrap(), x, y, z)
