@@ -8,7 +8,7 @@ use lazy_static::lazy_static;
 
 lazy_static! {
   pub static ref SBHANDLER: Mutex<Vec<SBHandler<'static>>> = Mutex::new(vec![]);
-  pub static ref MAP: Option<Map> = None;
+  pub static ref WORLD: Option<World> = None;
 }
 
 #[repr(u32)]
@@ -30,7 +30,7 @@ pub enum Id
 /// Represents a block in the world.
 pub struct Block
 {
-  id: block_id,
+  id: Id,
   variant: u32,
   tag: Vec<u32>,
 }
@@ -88,9 +88,9 @@ impl Chunk
 
 #[derive(Deserialize, Serialize)]
 /// A vectorized map of the world.
-pub struct Map
+pub struct World
 {
-  /// Chunks displayed on the map.
+  /// Chunks displayed in the world.
   chunk: Vec<Chunk>,
   /// The x coordinate of each chunk.
   x: Vec<i32>,
@@ -100,7 +100,7 @@ pub struct Map
   z: Vec<i32>,
 }
 
-impl Map
+impl World
 {
   /// Get the index of the chunk at the specified coordinates.
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> usize
@@ -120,7 +120,7 @@ impl Map
     
     match value {
       Some(v) => v,
-      None => Self::load_chunk(&mut MAP.unwrap(), x, y, z)
+      None => Self::load_chunk(&mut WORLD.unwrap(), x, y, z)
     }
   }
 
