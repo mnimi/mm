@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
 
-lazy_static!
-{
-  pub static mut ref SBHANDLER : Vec<SBHandler<'static>> = vec![];
-  pub static mut ref MAP : Map;
+lazy_static! {
+  pub static ref SBHANDLER: Mutex<Vec<SBHandler<'static>>> = Mutex::new(vec![]);
+  pub static ref MAP: Option<Map> = None;
 }
 
+#[repr(u32)]
 pub enum Id
 {
   Air,
@@ -25,7 +25,7 @@ pub enum Id
 pub struct Block
 {
   id: block_id,
-  variant : u32,
+  variant: u32,
   tag: Vec<u32>,
 }
 
@@ -34,32 +34,32 @@ pub trait SmartBlock
   fn update(self);
 }
 
-pub struct SBHandler<'a>{
-  chunk : &'a mut Chunk,
-  smart_block : Box<Vec<dyn SmartBlock>>,
-  block_index : Vec<usize>,
+pub struct SBHandler<'a>
+{
+  chunk: &'a mut Chunk,
+  smart_block: Box<Vec<dyn SmartBlock>>,
+  block_index: Vec<usize>,
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Liquid
 {
-  source_distance : u32
+  source_distance: u32
 }
+
 impl SmartBlock for Liquid
 {
-  fn update(self){
-
-  }
+  fn update(self) {}
 }
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Chunk
 {
-  x : i32,
-  y : i32,
-  z : i32,
-  block : Vec<Block>,
-  sb_handler_index : usize,
+  x: i32,
+  y: i32,
+  z: i32,
+  block: Vec<Block>,
+  sb_handler_index: usize,
 }
 
 impl Chunk
@@ -68,10 +68,9 @@ impl Chunk
   {
     (x + (y * 16) + (z * 256))
   }
-  pub fn adj(&self, index : u32){
-    let mut val : Vec<Block> = vec![];
+  pub fn adj(&self, index: u32) {
+    let mut val: Vec<Block> = vec![];
     let mut remainder = index;
-
   }
 }
 
@@ -88,11 +87,11 @@ impl Map
 {
   pub fn get_chunk(&self, x: i32, y: i32, z: i32) -> usize
   {
-    let mut value : Option<usize> = None;
+    let mut value: Option<usize> = None;
 
     for i in 0..self.x.len()
     {
-      if     self.x[i] == x
+      if self.x[i] == x
           && self.y[i] == y
           && self.z[i] == z
       {
@@ -101,11 +100,10 @@ impl Map
       }
     }
 
-    match value{
+    match value {
       Some(v) => v,
-      None => Self::load_chunk(&mut *MAP, x, y ,z)
+      None => Self::load_chunk(&mut MAP.unwrap(), x, y, z)
     }
-
   }
 
   pub fn load_chunk(&mut self, x: i32, y: i32, z: i32) -> usize
@@ -116,37 +114,42 @@ impl Map
       x,
       y,
       z,
-      block : vec![],
-      sb_handler_index : *SBHANDLER.len()
+      block: vec![],
+      sb_handler_index: *SBHANDLER.len(),
     };
-    let mut handler : SBHandler = SBHandler
+
+    let mut handler: SBHandler = SBHandler
     {
-      chunk : &mut chunk,
-      smart_block : Box::from(vec![]),
-      block_index : vec![],
+      chunk: &mut chunk,
+      smart_block: Box::from(vec![]),
+      block_index: vec![],
     };
+
     let mut i = 0;
+
     for block in chunk.block
     {
-      match block.id{
+      match block.id {
         Id::Water | Id::Lava =>
           {
-            handler.smart_block.push(Liquid{source_distance : block.variant});
+            handler.smart_block.push(Liquid { source_distance: block.variant });
             handler.block_index.push(i);
           }
-        _=> continue
+        _ => continue
       }
+
       i += 1;
     }
+
     *SBHANDLER.push(handler);
     self.chunk.push(chunk);
-
 
 
     self.chunk.len() - 1
   }
 
-  fn unload_chunk(x: i32, y: i32, z: i32){
+  fn unload_chunk(x: i32, y: i32, z: i32)
+  {
     todo!()
   }
 }

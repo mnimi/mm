@@ -1,3 +1,5 @@
+
+
 use std::fs::File;
 use std::io::Error;
 use std::io::Read;
@@ -21,6 +23,7 @@ pub struct App
 impl App
 {
   /// Initialise the application.
+  ///
   ///
   /// Returns a result containing one of two possible outcomes of the initialisation:
   /// Success, in which case we continue into the main application loop
@@ -50,6 +53,7 @@ impl App
 
     Ok(App { data })
   }
+
 
   pub fn run_time(&self)
   {
