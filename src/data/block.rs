@@ -5,6 +5,7 @@ Block-related data structures.
 
 use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
+use std::sync::{Arc, Mutex};
 
 lazy_static! {
   pub static ref SBHANDLER: Mutex<Vec<SBHandler<'static>>> = Mutex::new(vec![]);
@@ -43,7 +44,7 @@ pub trait SmartBlock
 pub struct SBHandler<'a>
 {
   chunk: &'a mut Chunk,
-  smart_block: Box<Vec<dyn SmartBlock>>,
+  smart_block: Vec<Arc<Mutex<dyn SmartBlock>>>,
   block_index: Vec<usize>,
 }
 
@@ -79,53 +80,53 @@ impl Chunk
     (x + (y * 16) + (z * 256)) as usize
   }
   
-  pub fn adj(&self, index: u32) -> Vec<Block>
+  pub fn adj(&self, index: u32) -> Vec<&Block>
   {
     let index = index as f32;
-    let mut val: Vec<Block> = vec![];
+    let mut val: Vec<&Block> = vec![];
     if (index % 16) + 1 > 15
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index - 15));
     } else
     {
-      val.push(self.block[index + 1]);
+      val.push(&self.block[index + 1]);
     }
     if (index % 16) - 1 < 0
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index + 15));
     } else
     {
-      val.push(self.block[index - 1]);
+      val.push(&self.block[index - 1]);
     }
 
-    if ((index % 256) / 16) as f32.floor() + 1 > 15
+    if (((index % 256) / 16) as f32).floor() + 1 > 15
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
     } else
     {
-      val.push(self.block[index + 16]);
+      val.push(&self.block[index + 16]);
     }
-    if ((index % 256) / 16) as f32.floor() - 1 < 0
+    if (((index % 256) / 16) as f32).floor() - 1 < 0
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
     } else
     {
-      val.push(self.block[index - 16]);
+      val.push(&self.block[index - 16]);
     }
 
-    if (index / 256) as f32.floor() + 1 > 15
+    if ((index / 256) as f32).floor() + 1 > 15
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
     } else
     {
-      val.push(self.block[index + 16]);
+      val.push(&self.block[index + 16]);
     }
-    if (index / 256) as f32.floor() - 1 < 0
+    if ((index / 256) as f32).floor() - 1 < 0
     {
       val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
     } else
     {
-      val.push(self.block[index - 16]);
+      val.push(&self.block[index - 16]);
     }
 
     val
