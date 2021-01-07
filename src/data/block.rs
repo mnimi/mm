@@ -7,11 +7,6 @@ use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
 use std::sync::{Arc, Mutex};
 
-lazy_static! {
-  pub static ref SBHANDLER: Mutex<Vec<SBHandler<'static>>> = Mutex::new(vec![]);
-  pub static ref WORLD: Option<World> = None;
-}
-
 #[repr(u32)]
 pub enum BlockId
 {
@@ -41,13 +36,6 @@ pub trait SmartBlock
   fn update(self);
 }
 
-pub struct SBHandler<'a>
-{
-  chunk: &'a mut Chunk,
-  smart_block: Vec<Arc<Mutex<dyn SmartBlock>>>,
-  block_index: Vec<usize>,
-}
-
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Liquid
 {
@@ -56,7 +44,7 @@ pub struct Liquid
 
 impl SmartBlock for Liquid
 {
-  fn update(self) {}
+  fn update(&self) {}
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -70,7 +58,7 @@ pub struct Chunk
   y: i32,
   z: i32,
   block: Vec<Block>,
-  sb_handler_index: usize,
+  world : &'static World,
 }
 
 impl Chunk
@@ -86,14 +74,14 @@ impl Chunk
     let mut val: Vec<&Block> = vec![];
     if (index % 16) + 1 > 15
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index - 15));
+      val.push(self.world.chunk_overflow(&self, index - 15));
     } else
     {
       val.push(&self.block[index + 1]);
     }
     if (index % 16) - 1 < 0
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index + 15));
+      val.push(self.world.chunk_overflow(&self, index + 15));
     } else
     {
       val.push(&self.block[index - 1]);
@@ -101,14 +89,14 @@ impl Chunk
 
     if (((index % 256) / 16) as f32).floor() + 1 > 15
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
+      val.push(self.world.unwrap().chunk_overflow(&self, index - 240));
     } else
     {
       val.push(&self.block[index + 16]);
     }
     if (((index % 256) / 16) as f32).floor() - 1 < 0
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
+      val.push(self.world.unwrap().chunk_overflow(&self, index + 240));
     } else
     {
       val.push(&self.block[index - 16]);
@@ -116,14 +104,14 @@ impl Chunk
 
     if ((index / 256) as f32).floor() + 1 > 15
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index - 240));
+      val.push(self.world.unwrap().chunk_overflow(&self, index - 240));
     } else
     {
       val.push(&self.block[index + 16]);
     }
     if ((index / 256) as f32).floor() - 1 < 0
     {
-      val.push(WORLD.unwrap().chunk_overflow(&self, index + 240));
+      val.push(self.world.unwrap().chunk_overflow(&self, index + 240));
     } else
     {
       val.push(&self.block[index - 16]);
@@ -162,11 +150,11 @@ impl World
     
     match value {
       Some(v) => v,
-      None => Self::load_chunk(&mut WORLD.unwrap(), x, y, z)
+      None => Self::load_chunk(&mut self, x, y, z)
     }
   }
 
-  pub fn load_chunk(&mut self, x: i32, y: i32, z: i32) -> usize
+  pub fn load_chunk(&self, x: i32, y: i32, z: i32) -> usize
   {
     //This needs to be replaced with proper chunk building.
     let mut chunk = Chunk
@@ -174,34 +162,12 @@ impl World
       x,
       y,
       z,
+      world : self,
       block: vec![],
-      sb_handler_index: *SBHANDLER.len(),
-    };
-
-    let mut handler: SBHandler = SBHandler
-    {
-      chunk: &mut chunk,
-      smart_block: Box::from(vec![]),
-      block_index: vec![],
     };
 
     let mut i = 0;
 
-    for block in chunk.block
-    {
-      match block.id {
-        BlockId::Water | BlockId::Lava =>
-          {
-            handler.smart_block.push(Liquid { source_distance: block.variant });
-            handler.block_index.push(i);
-          }
-        _ => continue
-      }
-
-      i += 1;
-    }
-
-    *SBHANDLER.push(handler);
     self.chunk.push(chunk);
 
 

@@ -16,11 +16,11 @@ where
   hash: dyn Hash
 }
 
-impl<T> EntityId<T>
+impl<T : Entity> EntityId<T>
 {
   pub fn new(entity: T) -> Box<Self>
   where
-      T: Entity + Sized
+      T: Sized
   {
     let mut hasher = DefaultHasher::new();
     hasher.write(entity.to_string().as_bytes());
